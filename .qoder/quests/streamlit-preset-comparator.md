@@ -4,7 +4,12 @@
 
 A production-grade Streamlit application that compares user-provided input values against a reference database in Excel format. The tool performs intelligent matching using advanced NLP and fuzzy matching techniques, handling complex data formats including units, conditions, and synonyms.
 
-**Repository Status**: Starting from empty repository - implementing complete solution from scratch
+**Repository Status**: GitHub repository initialized with existing data files
+
+**Current Assets:**
+- `Preset 25.xlsx` - Reference database (25.6MB)
+- `PIM sample input.xlsx` - Sample input template (16.5KB)
+- Git repository initialized
 
 ### Core Objectives
 - **Intelligent Comparison**: Advanced matching algorithms for complex value formats
@@ -30,15 +35,215 @@ Streamlit_Preset_Comparison_Tool/
 │   ├── sidebar.py                 # Sidebar configuration
 │   └── results_display.py         # Results visualization
 ├── data/
-│   ├── preset_database.xlsx       # Reference database (Preset 25.xlsx)
+│   ├── preset_database.xlsx       # Reference database (moved from Preset 25.xlsx)
 │   └── templates/
-│       └── input_template.xlsx    # User input template
+│       └── input_template.xlsx    # User input template (moved from PIM sample input.xlsx)
 ├── tests/
 │   ├── __init__.py
 │   ├── test_matching.py           # Matching algorithm tests
 │   ├── test_data_processing.py    # Data processing tests
 │   └── test_integration.py        # Integration tests
 └── README.md                      # Project documentation
+```
+
+## Getting Started - Step by Step
+
+### Current Repository Status
+```
+c:\Users\amo79\driving-school-v3\PIM_to_Preset_Compaire_Tool\
+├── .git/                    # ✅ Git repository initialized
+├── Preset 25.xlsx          # ✅ Your reference database
+├── PIM sample input.xlsx   # ✅ Your sample input file
+└── ~$Preset 25.xlsx       # (Excel temp file - can be ignored)
+```
+
+### Step 1: Create Basic Files
+
+First, let's create the minimum files needed to get your Streamlit app running:
+
+#### Create requirements.txt
+```txt
+streamlit==1.28.0
+pandas==2.0.3
+openpyxl==3.1.2
+```
+
+#### Create app.py (Basic Version)
+```python
+import streamlit as st
+import pandas as pd
+
+# Page configuration
+st.set_page_config(
+    page_title="Preset Comparison Tool",
+    page_icon="🔍",
+    layout="wide"
+)
+
+# Title
+st.title("🔍 Preset Comparison Tool")
+st.write("Upload your input file to compare against the preset database")
+
+# File upload
+uploaded_file = st.file_uploader(
+    "Choose your input Excel file", 
+    type=['xlsx'],
+    help="Upload an Excel file with the same structure as the template"
+)
+
+if uploaded_file is not None:
+    # Read the uploaded file
+    try:
+        input_df = pd.read_excel(uploaded_file)
+        st.success(f"File uploaded successfully! Found {len(input_df)} rows.")
+        
+        # Show preview
+        st.subheader("Preview of uploaded data:")
+        st.dataframe(input_df.head(10))
+        
+        # Show column info
+        st.subheader("Column Information:")
+        st.write(f"Columns found: {list(input_df.columns)}")
+        
+    except Exception as e:
+        st.error(f"Error reading file: {str(e)}")
+else:
+    st.info("Please upload an Excel file to get started.")
+    
+    # Show sample format
+    st.subheader("Expected file format:")
+    sample_data = {
+        'Category': ['Electronics', 'Clothing'],
+        'Sub-Category': ['Smartphones', 'Shirts'],
+        'Attribute Name': ['Screen Size', 'Material'],
+        'Input Values': ['6.1 inches', '100% Cotton']
+    }
+    st.dataframe(pd.DataFrame(sample_data))
+```
+
+### Step 2: Test Your Basic App
+
+To test if everything works:
+
+1. **Install Python packages:**
+   ```bash
+   pip install streamlit pandas openpyxl
+   ```
+
+2. **Run your app:**
+   ```bash
+   streamlit run app.py
+   ```
+
+3. **Open your browser** - Streamlit should automatically open at `http://localhost:8501`
+
+### Step 3: What You Should See
+
+- A clean web interface with the title "Preset Comparison Tool"
+- A file upload area
+- When you upload your `PIM sample input.xlsx`, it should show:
+  - Success message
+  - Preview of your data
+  - Column information
+
+### Step 4: Next Development Phase
+
+Once the basic app is working, we can add:
+- Load the preset database
+- Implement basic comparison logic
+- Add results display
+- Implement advanced matching algorithms
+
+## Quick Start Implementation Guide
+
+### Step 1: Organize Your Repository
+
+```bash
+# Create the project structure
+mkdir utils components data tests data/templates .streamlit
+
+# Move your existing files
+move "Preset 25.xlsx" data/preset_database.xlsx
+move "PIM sample input.xlsx" data/templates/input_template.xlsx
+
+# Remove temporary Excel lock file
+del "~$Preset 25.xlsx"
+```
+
+### Step 2: Create Essential Files
+
+#### 1. requirements.txt
+```txt
+streamlit>=1.28.0
+pandas>=2.0.0
+openpyxl>=3.1.0
+rapidFuzz>=3.4.0
+sentence-transformers>=2.2.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+streamlit-aggrid>=0.3.4
+```
+
+#### 2. config.py
+```python
+import os
+from pathlib import Path
+
+# File paths
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+PRESET_DB_PATH = DATA_DIR / "preset_database.xlsx"
+TEMPLATE_PATH = DATA_DIR / "templates" / "input_template.xlsx"
+
+# Matching settings
+MATCHING_THRESHOLD = 0.75
+MAX_FILE_SIZE_MB = 50
+
+# UI settings
+APP_TITLE = "Preset Comparison Tool"
+APP_ICON = "🔍"
+```
+
+#### 3. Basic app.py
+```python
+import streamlit as st
+import pandas as pd
+from pathlib import Path
+import config
+
+st.set_page_config(
+    page_title=config.APP_TITLE,
+    page_icon=config.APP_ICON,
+    layout="wide"
+)
+
+st.title(config.APP_TITLE)
+st.write("Welcome to the intelligent preset comparison tool!")
+
+# Basic file upload test
+uploaded_file = st.file_uploader("Upload your input file", type=['xlsx'])
+if uploaded_file:
+    df = pd.read_excel(uploaded_file)
+    st.write("File uploaded successfully!")
+    st.dataframe(df.head())
+```
+
+### Step 3: Test Basic Setup
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the basic app
+streamlit run app.py
+```
+
+### Step 4: Commit Initial Setup
+
+```bash
+git add .
+git commit -m "Initial project setup with data files and basic structure"
+git push origin main
 ```
 
 ## Technology Stack & Dependencies
@@ -139,18 +344,32 @@ graph TB
 
 ### Phase 1: Project Setup and Core Infrastructure
 
-#### Repository Initialization
+#### Repository Status Check ✅
 ```bash
-# Clone and setup repository
-git clone https://github.com/ahmed0z/Streamlit_Preset_Comparison_Tool.git
-cd Streamlit_Preset_Comparison_Tool
+# Repository is already initialized with:
+# - .git/ directory
+# - Preset 25.xlsx (reference database)
+# - PIM sample input.xlsx (sample template)
+```
 
-# Create virtual environment
+#### Immediate Next Steps
+```bash
+# 1. Create project structure
+mkdir utils components data tests
+mkdir data/templates
+mkdir .streamlit
+
+# 2. Move existing files to proper locations
+mv "Preset 25.xlsx" data/preset_database.xlsx
+mv "PIM sample input.xlsx" data/templates/input_template.xlsx
+
+# 3. Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements.txt
+# 4. Create requirements.txt and install dependencies
+pip install streamlit>=1.28.0 pandas>=2.0.0 openpyxl>=3.1.0
+pip freeze > requirements.txt
 ```
 
 #### Core File Structure Creation
